@@ -1,0 +1,256 @@
+<?php
+/** @var  \WeltPixel\Newsletter\Helper\Data $_helper */
+$_helper = $this->helper('WeltPixel\Newsletter\Helper\Data');
+$isTriggerButtonEnabled = $_helper->isTriggerButtonEnabled();
+$triggerButtonAdditionalClass = $_helper->hideTriggerButtonOnMobile() ? 'hide-mobile' : '';
+$countPages = $_helper->canShowPopup(true);
+$justTriggerButton = true;
+?>
+<?php if (!$_helper->canShowPopup()) : ?>
+    <?php
+    if ($countPages) :
+        $visitedPages = $_helper->getVisitedPages();
+        ?>
+        <span class="justCountPage" style="display: none"></span>
+        <script type="text/x-magento-init">
+            {
+                ".justCountPage": {
+                    "WeltPixel_Newsletter/js/widget/newsletterpopup": {
+                        "newsletterPopup": true,
+                        "justCountPages": true,
+                        "visitedPages": "<?php /* @noEscape */ echo $visitedPages ?>"
+                    }
+                }
+            }
+        </script>
+    <?php endif; ?>
+<?php else : ?>
+    <?php $justTriggerButton = false; ?>
+<?php endif; ?>
+
+
+<?php if ($isTriggerButtonEnabled || !$justTriggerButton): ?>
+    <?php
+    $displayBlockId = $_helper->getDisplayBlock();
+    $displayBlockStep1 = $_helper->getDisplayBlockStep1();
+    $lightboxDivId = 'wpn-lightbox-content';
+    $closeDivId = 'wpn-lightbox-close-newsletter';
+    $version = $_helper->getVersion();
+    $cookieLifeTime = $_helper->getLifeTime();
+    $cookieName = $_helper->getCookieName();
+    $cookieNameSubscried = $_helper->getCookieNameSubscribed();
+    $blockContent = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId($displayBlockId)->toHtml();
+    $blockContentStep1 = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId($displayBlockStep1)->toHtml();
+    $visitedPages = $_helper->getVisitedPages();
+    $secondsToDisplay = $_helper->getSecondsToDisplay();
+    $closeOption = $_helper->getCloseOption();
+    $isRequestAjax = $_helper->isRequestAjax();
+    $overlayColor = $_helper->getOverlayColor();
+    $overlayOpacity = $_helper->getOverlayOpacity();
+    $signupSteps = $_helper->getSignupSteps();
+    $step1ProceedButtonLabel = $_helper->getStep1ProceedButtonLabel();
+    $step1CloseButtonEnabled = $_helper->isStep1CloseButtonEnabled();
+    $step1CloseButtonLabel = $_helper->getStep1CloseButtonLabel();
+    $triggerButtonTitle = $_helper->getTriggerButtonTitle();
+    $triggerButtonColor = $_helper->getTriggerButtonColor();
+    $triggerButtonBackgroundColor = $_helper->getTriggerButtonBackgroundColor();
+    $isGtmTrackingEnabled = $_helper->isPopupGtmTrackingEnabled();
+    $slIntegration = $_helper->getSocialLoginIntegration();
+    $slAppliesTo = $_helper->getSocialLoginAppliesTo();
+
+    switch ($version) {
+        case '2':
+            $lightboxDivId .= '-v2';
+            $closeDivId .= '-v2';
+            break;
+        case '3':
+            $lightboxDivId .= '-v3';
+            break;
+        case '4':
+            $lightboxDivId .= '-v4';
+            $closeDivId .= '-v4';
+            break;
+    }
+
+    $closeOnOverlayAlso = false;
+    if ($closeOption == \WeltPixel\Newsletter\Model\Config\Source\DisplayDisableOptions::MODE_CLOSE_BUTTON_AND_OUTSIDE_CLICK) {
+        $closeOnOverlayAlso = true;
+    }
+    ?>
+    <div class="wp_newsletter_container">
+        <?php if ($signupSteps != \WeltPixel\Newsletter\Model\Config\Source\SignupSteps::STEP_1) : ?>
+            <div class="weltpixel_newsletter_step1">
+                <?php /* @noEscape */ echo $blockContentStep1; ?>
+                <div class="step1-buttons">
+                    <button class="action primary wp-nl-next-step wp-newsletter-button"
+                            title="<?= $block->escapeHtml($step1ProceedButtonLabel) ?>" type="button">
+                        <span><?= $block->escapeHtml($step1ProceedButtonLabel) ?></span>
+                    </button>
+                    <?php if ($step1CloseButtonEnabled) : ?>
+                        <button class="action primary wp-nl-close-popup wp-newsletter-button"
+                                title="<?= $block->escapeHtml($step1CloseButtonLabel) ?>" type="button">
+                            <span><?= $block->escapeHtml($step1CloseButtonLabel) ?></span>
+                        </button>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+        <div id="wpx-newsletter-popup" class="weltpixel_newsletter wp_newsletter_v<?php /* @noEscape */ echo $version ?>">
+            <style scoped>
+                #wpn-lightbox-overlay {
+                    background: <?php /* @noEscape */ echo $overlayColor; ?>;
+                    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=<?php  /* @noEscape */ echo $overlayOpacity*100; ?>)";
+                    filter: alpha(opacity=<?php  /* @noEscape */ echo $overlayOpacity*100; ?>);
+                    -moz-opacity: <?php  /* @noEscape */ echo $overlayOpacity; ?>;
+                    -khtml-opacity: <?php  /* @noEscape */ echo $overlayOpacity; ?>;
+                    opacity: <?php  /* @noEscape */ echo $overlayOpacity; ?>;
+                }
+
+                <?php if ($isTriggerButtonEnabled) : ?>
+                .wp_newsletter_trigger_button a.wp_newsletter_trigger span {
+                    color: <?php  /* @noEscape */ echo $triggerButtonColor ?>;
+                    background-color: <?php  /* @noEscape */ echo $triggerButtonBackgroundColor; ?>;
+                }
+
+                <?php endif; ?>
+            </style>
+            <?php  /* @noEscape */ echo $blockContent; ?>
+        </div>
+    </div>
+    <?php if ($isTriggerButtonEnabled) : ?>
+        <div class="wp_newsletter_trigger_button <?=  /* @noEscape */ $triggerButtonAdditionalClass ?>">
+            <a class="wp_newsletter_trigger" href="#">
+                <span class="wp_triggerbtn_title"><?php  /* @noEscape */ echo $triggerButtonTitle; ?></span>
+            </a>
+        </div>
+    <?php endif; ?>
+    <script type="text/x-magento-init">
+        {
+            "#wpx-newsletter-popup": {
+                "WeltPixel_Newsletter/js/widget/newsletterpopup": {
+                    "newsletterPopup": true,
+                    "justCountPages": false,
+                    "justTriggerButton": <?php  /* @noEscape */ echo $justTriggerButton ? 'true' : 'false' ?>,
+                    "triggerButtonEnabled": <?php  /* @noEscape */ echo $isTriggerButtonEnabled ? 'true' : 'false'; ?>,
+                    "closeOnOverlayAlso": "<?php  /* @noEscape */ echo $closeOnOverlayAlso ?>",
+                    "cookieName": "<?php  /* @noEscape */ echo $cookieName ?>",
+                    "cookieNameSubscribed": "<?php  /* @noEscape */ echo $cookieNameSubscried ?>",
+                    "cookieLifetime": "<?php  /* @noEscape */ echo $cookieLifeTime ?>",
+                    "visitedPages": "<?php  /* @noEscape */ echo $visitedPages ?>",
+                    "secondsToDisplay": "<?php  /* @noEscape */ echo $secondsToDisplay ?>",
+                    "isAjax": "<?php  /* @noEscape */ echo $isRequestAjax ?>",
+                    "steps": "<?php  /* @noEscape */ echo $signupSteps ?>",
+                    "version": <?php  /* @noEscape */ echo $version ?>,
+                    "lightboxDivId": "<?php  /* @noEscape */ echo $lightboxDivId ?>",
+                    "closeDivId": "<?php  /* @noEscape */ echo $closeDivId ?>",
+                    "gtmTracking": "<?php  /* @noEscape */ echo $isGtmTrackingEnabled ?>",
+                    "slIntegration": "<?php /* @noEscape */ echo $slIntegration ?>",
+                    "slAppliesTo": "<?php  /* @noEscape */ echo $slAppliesTo ?>"
+                }
+            }
+        }
+    </script>
+<?php endif; ?>
+
+<?php
+$cookieLifeTime = $_helper->getLifeTime();
+$cookieNameSubscried = $_helper->getCookieNameSubscribed();
+$isExitIntentEnabled = $_helper->isExitIntentEnabled();
+$exitIntentLightboxDivId = 'wpn-exitintent-lightbox-content';
+$exitIntentCloseDivId = 'wpn-lightbox-close-exitintent';
+$exitIntentCookieName = $_helper->getExitIntentCookieName();
+$exitIntentDisplayUserSubscribed = $_helper->exitIntenDisplayUserSubscribed();
+$exitIntentDisplayClosedPopup= $_helper->exitIntenDisplayClosedPopup();
+$exitIntentCloseOption = $_helper->getExitIntentCloseOption();
+$exitIntentVersion = $_helper->getExitIntentVersion();
+$exitIntentOverlayColor = $_helper->getExitIntentOverlayColor();
+$exitIntentOverlayOpacity = $_helper->getExitIntentOverlayOpacity();
+$exitIntentDisplayBlockId = $_helper->getExitIntentDisplayBlock();
+$exitIntentDisplayBlockStep1 = $_helper->getExitIntentDisplayBlockStep1();
+$exitIntentBlockContent = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId($exitIntentDisplayBlockId)->toHtml();
+$exitIntentBlockContentStep1 = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId($exitIntentDisplayBlockStep1)->toHtml();
+$exitIntentSignupSteps = $_helper->getExitIntentSignupSteps();
+$exitIntentStep1ProceedButtonLabel = $_helper->getExitIntentStep1ProceedButtonLabel();
+$exitIntentStep1CloseButtonLabel = $_helper->getExitIntentStep1CloseButtonLabel();
+$exitIntentStep1CloseButtonEnabled = $_helper->isExitIntentStep1CloseButtonEnabled();
+$isExitIntentGtmTrackingEnabled = $_helper->isExitIntentGtmTrackingEnabled();
+$exitIntentCloseOnOverlayAlso = false;
+$slIntegration = $_helper->getSocialLoginIntegration();
+$slAppliesTo = $_helper->getSocialLoginAppliesTo();
+
+if ($exitIntentCloseOption ==  \WeltPixel\Newsletter\Model\Config\Source\DisplayDisableOptions::MODE_CLOSE_BUTTON_AND_OUTSIDE_CLICK) {
+    $exitIntentCloseOnOverlayAlso = true;
+}
+
+switch ($exitIntentVersion) {
+    case '2':
+        $exitIntentLightboxDivId .= '-v2';
+        $exitIntentCloseDivId .= '-v2';
+        break;
+    case '3':
+        $exitIntentLightboxDivId .= '-v3';
+        break;
+    case '4':
+        $exitIntentLightboxDivId .= '-v4';
+        $exitIntentCloseDivId .= '-v4';
+        break;
+}
+
+
+?>
+<?php if ($isExitIntentEnabled) : ?>
+<div class="wp_exitintent_container">
+    <div id="wpx-exitintent-popup" class="weltpixel_newsletter wp_newsletter_v<?php  /* @noEscape */ echo $exitIntentVersion ?>">
+        <style scoped>
+            #wpn-exitintent-lightbox-overlay {
+                background: <?php  /* @noEscape */ echo $exitIntentOverlayColor; ?>;
+                -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=<?php  /* @noEscape */ echo $exitIntentOverlayOpacity*100; ?>)";
+                filter: alpha(opacity=<?php  /* @noEscape */ echo $exitIntentOverlayOpacity*100; ?>);
+                -moz-opacity: <?php  /* @noEscape */ echo $exitIntentOverlayOpacity; ?>;
+                -khtml-opacity: <?php  /* @noEscape */ echo $exitIntentOverlayOpacity; ?>;
+                opacity: <?php  /* @noEscape */ echo $exitIntentOverlayOpacity; ?>;
+            }
+        </style>
+        <?php  /* @noEscape */ echo $exitIntentBlockContent; ?>
+    </div>
+    <?php if ($exitIntentSignupSteps != \WeltPixel\Newsletter\Model\Config\Source\SignupSteps::STEP_1) : ?>
+        <div class="weltpixel_exitintent_newsletter_step1">
+            <?php  /* @noEscape */ echo $exitIntentBlockContentStep1; ?>
+            <div class="step1-buttons">
+                <button class="action primary wp-ei-next-step wp-newsletter-button"
+                        title="<?= $block->escapeHtml($exitIntentStep1ProceedButtonLabel) ?>" type="button">
+                    <span><?= $block->escapeHtml($exitIntentStep1ProceedButtonLabel) ?></span>
+                </button>
+                <?php if ($exitIntentStep1CloseButtonEnabled) : ?>
+                    <button class="action primary wp-ei-close-popup wp-newsletter-button"
+                            title="<?= $block->escapeHtml($exitIntentStep1CloseButtonLabel) ?>" type="button">
+                        <span><?= $block->escapeHtml($exitIntentStep1CloseButtonLabel) ?></span>
+                    </button>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>
+    <script type="text/x-magento-init">
+        {
+            ".wp_exitintent_container": {
+                "WeltPixel_Newsletter/js/widget/newsletterpopup": {
+                    "cookieNameSubscribed": "<?php  /* @noEscape */ echo $cookieNameSubscried ?>",
+                    "cookieLifetime": "<?php  /* @noEscape */ echo $cookieLifeTime ?>",
+                    "exitIntent": "<?php  /* @noEscape */ echo $isExitIntentEnabled ?>",
+                    "exitIntentCookieName": "<?php  /* @noEscape */ echo $exitIntentCookieName ?>",
+                    "exitIntentDisplayUserSubscribed": "<?php  /* @noEscape */ echo $exitIntentDisplayUserSubscribed ?>",
+                    "exitIntentDisplayClosedPopup": "<?php  /* @noEscape */ echo $exitIntentDisplayClosedPopup ?>",
+                    "exitIntentVersion": <?php  /* @noEscape */ echo $exitIntentVersion ?>,
+                    "exitIntentLightboxDivId": "<?php  /* @noEscape */ echo $exitIntentLightboxDivId ?>",
+                    "exitIntentCloseDivId": "<?php  /* @noEscape */ echo $exitIntentCloseDivId ?>",
+                    "exitIntentSteps": "<?php  /* @noEscape */ echo $exitIntentSignupSteps ?>",
+                    "exitIntentCloseOnOverlayAlso": "<?php  /* @noEscape */ echo $exitIntentCloseOnOverlayAlso ?>",
+                    "exitIntentGtmTracking": "<?php  /* @noEscape */ echo $isExitIntentGtmTrackingEnabled ?>",
+                    "slIntegration": "<?php  /* @noEscape */ echo $slIntegration ?>",
+                    "slAppliesTo": "<?php  /* @noEscape */ echo $slAppliesTo ?>"
+                }
+            }
+        }
+    </script>
+<?php endif; ?>
