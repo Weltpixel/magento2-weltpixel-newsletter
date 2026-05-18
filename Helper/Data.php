@@ -438,7 +438,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function exitIntenDisplayUserSubscribed()
     {
-        return (boolean)$this->_newsletterOptions['exitintent']['exitintent_display_user_subscribed'];
+        return (bool)$this->_newsletterOptions['exitintent']['exitintent_display_user_subscribed'];
     }
 
     /**
@@ -446,7 +446,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function exitIntenDisplayClosedPopup()
     {
-        return (boolean)$this->_newsletterOptions['exitintent']['exitintent_display_closed_popup'];
+        return (bool)$this->_newsletterOptions['exitintent']['exitintent_display_closed_popup'];
     }
 
     /**
