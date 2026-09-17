@@ -29,7 +29,7 @@ $closeButtonLabel = $_helper->getExitIntentNewsletterCloseButtonLabel();
             <?php  if ($_helper->isExitIntentTermsConditionsCheckboxRequired()) : ?>
             <input id="exitintent_terms_conditions_consent" name="terms_conditions_consent" type="checkbox" data-validate="{required:true}" />
             <?php endif; ?>
-            <label for="exitintent_terms_conditions_consent" ><?php  /* @noEscape */ echo $_helper->getExitIntentTermsConditionsText(); ?></label>
+            <label for="exitintent_terms_conditions_consent" ><?php echo $block->escapeHtml($_helper->getExitIntentTermsConditionsText(), ['a', 'b', 'strong', 'em', 'i', 'u', 'br', 'span', 'p']); ?></label>
         </div>
         <?php endif; ?>
     </div>

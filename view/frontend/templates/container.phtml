@@ -120,7 +120,7 @@ $justTriggerButton = true;
     <?php if ($isTriggerButtonEnabled) : ?>
         <div class="wp_newsletter_trigger_button <?=  /* @noEscape */ $triggerButtonAdditionalClass ?>">
             <a class="wp_newsletter_trigger" href="#">
-                <span class="wp_triggerbtn_title"><?php  /* @noEscape */ echo $triggerButtonTitle; ?></span>
+                <span class="wp_triggerbtn_title"><?php echo $block->escapeHtml($triggerButtonTitle); ?></span>
             </a>
         </div>
     <?php endif; ?>

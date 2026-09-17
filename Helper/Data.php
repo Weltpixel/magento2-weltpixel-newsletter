@@ -87,11 +87,38 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Allow only a genuine CSS colour through, so a stored value cannot break out of the inline style block.
+     *
+     * @param mixed $value
+     * @return string
+     */
+    protected function _cssColor($value)
+    {
+        if (!is_scalar($value)) {
+            return '';
+        }
+        $value = trim((string)$value);
+        if ($value === '') {
+            return '';
+        }
+        if (preg_match('/^#[0-9a-fA-F]{3,8}$/', $value)) {
+            return $value;
+        }
+        if (preg_match('/^[a-zA-Z]+$/', $value)) {
+            return $value;
+        }
+        if (preg_match('/^(?:rgba?|hsla?)\(\s*[0-9a-zA-Z.,%\s\/+-]+\s*\)$/', $value)) {
+            return $value;
+        }
+        return '';
+    }
+
+    /**
      * @return string
      */
     public function getOverlayColor()
     {
-        return $this->_newsletterOptions['general']['overlay_color'];
+        return $this->_cssColor($this->_newsletterOptions['general']['overlay_color']);
     }
 
     /**
@@ -99,7 +126,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getOverlayOpacity()
     {
-        return $this->_newsletterOptions['general']['overlay_opacity'];
+        return (float)$this->_newsletterOptions['general']['overlay_opacity'];
     }
 
     /**
@@ -161,7 +188,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getVisitedPages()
     {
-        return $this->_newsletterOptions['general']['display_after_pages'];
+        return (int)$this->_newsletterOptions['general']['display_after_pages'];
     }
 
     /**
@@ -398,7 +425,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getTriggerButtonColor()
     {
-        return $this->_newsletterOptions['general']['trigger_button_color'];
+        return $this->_cssColor($this->_newsletterOptions['general']['trigger_button_color']);
     }
 
     /**
@@ -406,7 +433,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getTriggerButtonBackgroundColor()
     {
-        return $this->_newsletterOptions['general']['trigger_button_backgroundcolor'];
+        return $this->_cssColor($this->_newsletterOptions['general']['trigger_button_backgroundcolor']);
     }
 
     /**
@@ -462,7 +489,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getExitIntentOverlayColor()
     {
-        return $this->_newsletterOptions['exitintent']['exitintent_overlay_color'];
+        return $this->_cssColor($this->_newsletterOptions['exitintent']['exitintent_overlay_color']);
     }
 
     /**
@@ -470,7 +497,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getExitIntentOverlayOpacity()
     {
-        return $this->_newsletterOptions['exitintent']['exitintent_overlay_opacity'];
+        return (float)$this->_newsletterOptions['exitintent']['exitintent_overlay_opacity'];
     }
 
     /**
